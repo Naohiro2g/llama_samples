@@ -16,9 +16,14 @@ def predict(message, history):
         messages.append({"role": "user", "content": human_content})
         messages.append({"role": "system", "content": system_content})
 
-    response = llm.create_chat_completion(messages)
+    streamer = llm.create_chat_completion(messages, stream=True)
 
-    return response['choices'][0]['message']['content']
+    partial_message = ""
+    for msg in streamer:
+        message = msg['choices'][0]['delta']
+        if 'content' in message:
+            partial_message += message['content']
+            yield partial_message
 
 
 llm.create_chat_completion(
@@ -32,5 +37,4 @@ llm.create_chat_completion(
 )
 
 webbrowser.open('http://127.0.0.1:7860', new=0, autoraise=True)
-iface = gr.ChatInterface(fn=predict)
-iface.launch()
+gr.ChatInterface(predict).queue().launch()
