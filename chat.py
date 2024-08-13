@@ -1,5 +1,7 @@
 import gradio as gr
 from llama_cpp import Llama
+import webbrowser
+
 
 llm = Llama(
     model_path="models/Llama-3-ELYZA-JP-8B-q4_k_m.gguf",
@@ -19,7 +21,6 @@ def predict(message, history):
     return response['choices'][0]['message']['content']
 
 
-
 llm.create_chat_completion(
     messages=[
         {
@@ -30,6 +31,6 @@ llm.create_chat_completion(
     max_tokens=512,
 )
 
-
+webbrowser.open('http://127.0.0.1:7860', new=0, autoraise=True)
 iface = gr.ChatInterface(fn=predict)
 iface.launch()
